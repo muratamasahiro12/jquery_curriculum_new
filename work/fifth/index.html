@@ -97,6 +97,31 @@
       // .data('') DOM要素にあるdata-~を取得できる
       // .change() セレクトボックスの値の変更をキャッチする関数
       // $().each() DOM要素を1つずつループ処理をする（ループ内で$(this)を使うと要素がひとつずつ取得できる）
+      $(function() {
+        $('.select').change(sort);
+        function sort() {
+          var se_val=$(this).val();
+          if(se_val=='all'){
+            $('.list').children().each(function(){
+              $(this).show()
+            });
+          } else {
+            $('.list').children().each(function(){
+              if(se_val==$(this).data('category-type')){
+                $(this).show();
+              } else {
+                $(this).hide();
+              }
+            });
+          }
+        };
+      });
+// selectクラスをクリックする引数sortが処理される
+// sortに選択された要素のvalueがse_valに代入される
+// if文にてse_valがallと一致していればlist内の子要素をそれぞれ表示
+// 違う場合はlistの子要素でそれぞれループ処理される
+// もしse_valとlistの選択されている子要素データのcategory-typeが一致していれば表示
+// 一致しなければ非表示
     </script>
   </body>
 </html>

@@ -51,7 +51,7 @@
   </div>
   <h2 class="sub-title">Q9</h2>
   <div class="question">
-    <div class="btn" id="q9" data-text="jQuery">Q9</div>
+    <div class="btn" id="q9" data-text="jQuery"  >Q9</div>
   </div>
   <h2 class="sub-title">Q10</h2>
   <div class="question">
@@ -69,16 +69,110 @@
 </div>
 <script src="../../common/js/jquery.js"></script>
 <script>
+  $(function() {
 // 第1問  id='q1'の要素の文字色を赤色にせよ。
+    $("#q1").css("color", "red");
+    //  効果を効かせたいDOMをセレクタに入力、オブジェクトを操作したいを操作したい命令分(メソッド)にてDOMのcolorをredに変更
+    // $でJquery("id指定だから#q1")の.cssでcolorのred追加
+    // ブルー
+    // cssで背景色をブルーに変更
+    $("#q1").css("background-color", "blue");
+
 // 第2問  id='q2'の要素をクリックしたら背景色をピンクにせよ。
+    $("#q2").click(function() {
+      $(this).css("background-color", "pink");
+    });
+
+    // 引数使ったら
+    // $("#q2").click(colorring);
+    // function colorring() {
+    //   $(this).css("background-color", "pink");
+    // }
+    // ↓別のところでも使いやすい
+    // $("#q3").click(colorring);
+
 // 第3問  id='q3'の要素をクリックしたら2秒かけてフェードアウトさせよ。
+    $("#q3").click(fo);
+    function fo() {
+      $(this).fadeOut(2000);
+    };
+// HTML要素.fadeOut( 時間(ミリ秒),第二引数 )
+// ↓引数使わない場合+引数使ったら
+// $("#q3").click(function fadeOut() {
+//   $(this).fadeOut(2000, function() {
+//     console.log('フェードアウトされました！');
+// })});
+
 // 第4問  id='q4'の要素をクリックしたらこの要素の前後とこの要素内の前後にテキストを挿入せよ。
+    $("#q4").click(function() {
+      $("#q4").prepend("DOMの中の前")
+            .append("DOMの中の後")
+            .before("DOMの前")
+            .after("DOMの後");
+    });
+// prependで要素内に文字列やHTML要素追加、appendが後ろに追加
+// メソッドチェーンとは、“.”を使ってメソッドを繋げて呼び出す方法
+// $("セレクタ").メソッド().メソッド().メソッド().
 // 第5問  id='q5'の要素をクリックしたらこの要素にlargeというクラスを付与せよ。
+    $("#q5").click(function() {
+      $("#q5").addClass("large");
+    });
+// addclassで指定した要素にclassを追加する
 // 第6問  id='q6'の要素をクリックしたらこの要素を2秒かけてmargin-topとmargin-leftを100pxの位置に移動させよ。
+    $("#q6").click(function() {
+      $("#q6").animate({
+      "marginTop": 100,
+      "marginLeft": 100
+      }, 2000)
+    });
+// 「animate()」は、対象となるHTML要素にいくつかのオプションを設定して実行するのが基本となります。
+// 対象要素.animate( CSSプロパティ, duration[今回だと2000], easing, 関数 )
+// CSSプロパティ以外は省略可能、
+// キャメルケースで記載
+// https://www.sejuku.net/blog/62848
 // 第7問  id='q7'の子要素をクリックしたら、その要素のインデックス（何番目か）をconsole.log()とalert()を用いて表示させよ。
+    $("#q7").find("li").click(function() {
+      var targetNum = $(this).index();
+      console.log(targetNum);
+      alert(targetNum);
+    });
+// q7の中の全ての子要素からliを見つけてクリックされたら関数が行われる。
+// 変数targetNumにクリックされた要素のインデックスが代入される。
+// その変数targetNumをアラートとコンソールに表示させる
 // 第8問  id='q8'の要素をhoverしたらlargeというクラスを付与し、hoverが外れたら、クラスを削除せよ。
+    $("#q8").hover(function() {
+      $("#q8").addClass("large");
+      }, function() {
+    $("#q8").removeClass("large");
+    });
+// q8にホバーした時、関数実行
+// q8にlargeclass追加,で区切ってremoveclassでlargeclass解除
+// 【 対象要素.hover( 関数(hoverしたときの関数), 関数(離れたときの関数) ) 】
+// addClassでクラス追加、removeClassでクラス解除
 // 第9問  id='q9'の要素をクリックしたらこの要素に設定してあるdata属性をconsoleに表示せよ。
+    $("#q9").click(dt);
+    function dt() {
+      var text = $("#q9").data("text");
+      console.log(text);
+    }
+// r9をクリックするイベント発生したら、関数実行
+// 変数textにq9のdate属性のtextを代入
+// consoleに変数text表示
+// date(何も入れなければdate属性の要素全て表示)
+      // $("#q9").click(function() {
+        //   var text = $("#q9").data("text");
+        //   console.log(text);
+      // });
 // 第10問 id='q10'の子要素をクリックしたら、その要素のインデックスと等しいid='q11'の子要素にlargeというクラスを追加せよ。
+    $("#q10").find("li").click(function() {
+      var num = $(this).index();
+      $("#q11").find("li").eq(num).addClass("large");
+    });
+  });
+// q10の子要素からliを見つけてそれをクリックしたら
+// numにイベント発生した要素(li)のインデックスを代入
+// q11の子要素のliのインデックス番号がnumに代入される
+// q11からliを見つけてeqで指定した指定した要素を取り出し、addClassでlargeを追加する
 </script>
 </body>
 </html>

@@ -21,12 +21,46 @@
     </div>
     <script src="../../common/js/jquery.js"></script>
     <script>
+      $(function(){
+        $(".modal-show").click(show);
+        function show() {
+          $(".modal").fadeIn();
+        }
+        $(".modal-close").click(close);
+        function close() {
+          $(".modal").fadeOut();
+        }
+      });
       // 今回やるのはモーダルです。
       // .modal-show をクリックすることで .modal をfadeInさせる。
       // .modal-close をクリックで .modal をfadeOutさせる。
       // .click() クリック時のイベントを登録する。
       // .fadeIn() 一定時間かけてフェードインする。
       // .fadeOut() 一定時間かけてフェードアウトする。
+
+      // modal-showをクリックしたらdisplay:noneで見えなくしているmodalをfadeInする
+      // modal-closeをクリックしたら表示されているmodalをfadeOutさせる
+
+      // おまけ
+      // style="display: none;"がなかったら隠れていない
+      // .on(click)はmodal-showがdivで囲われていてdivの中のmodal-showを複数効果付けたい時に使うとよさそう
+      // $(function(){
+//     $(".modal-show").on("click",function(){
+//         $(".modal").fadeIn();
+//         return false;
+//     });
+//     $(".modal-close").on("click",function(){
+//         $(".modal").fadeOut();
+//         return false;
+//     });
+// });
+      // 引数使わないなら
+        // $(".modal-show").click(function(){
+    //     $(".modal").fadeIn();
+    // });
+    // $(".modal-close").click(function(){
+    //     $(".modal").fadeOut();
+    // });
     </script>
   </body>
 </html>
