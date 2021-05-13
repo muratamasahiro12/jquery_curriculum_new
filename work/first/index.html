@@ -106,9 +106,9 @@
 // 第4問  id='q4'の要素をクリックしたらこの要素の前後とこの要素内の前後にテキストを挿入せよ。
     $("#q4").click(function() {
       $("#q4").prepend("DOMの中の前")
-            .append("DOMの中の後")
-            .before("DOMの前")
-            .after("DOMの後");
+              .append("DOMの中の後")
+              .before("DOMの前")
+              .after("DOMの後");
     });
 // prependで要素内に文字列やHTML要素追加、appendが後ろに追加
 // メソッドチェーンとは、“.”を使ってメソッドを繋げて呼び出す方法
@@ -143,7 +143,7 @@
     $("#q8").hover(function() {
       $("#q8").addClass("large");
       }, function() {
-    $("#q8").removeClass("large");
+      $("#q8").removeClass("large");
     });
 // q8にホバーした時、関数実行
 // q8にlargeclass追加,で区切ってremoveclassでlargeclass解除

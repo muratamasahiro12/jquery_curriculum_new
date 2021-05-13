@@ -55,16 +55,6 @@
           $(this).children().next().stop().slideUp();
         })
       });
-            // ↓childrenとnextを使用しない場合
-      // $(function(){
-      //   $('.menu__list').children().hover(function(){
-      //     $(this).find('.menu__list__childList').stop().slideDown();
-      //   }
-      //   , function(){
-      //     $(this).find('.menu__list__childList').stop().slideUp();
-      //   })
-      // });
-      
       // ul(menu__list)の子要素（li）にhoverした時に関数処理
       // イベントが発生した要素の子要素(p)の次の要素(menu__list__childList)をスライドダウンさせる。スライドダウンの前にstop()をつけることで発生しているイベントが解除された時にスライドダウンを解除できる。
       // hover解除時はイベント発生した要素の子要素の次の要素のスライドアップする。
@@ -78,7 +68,25 @@
       // .next() 要素の隣の要素を取得します。これは使わなくてもできます。
       // .children() 要素の子要素を取得します。
       // .stop() 現在動作中のアニメーション処理を全て中止します。
-
+      
+      // ↓next使わない場合
+      // $(function(){
+      //   $('.menu__list').children().hover(function(){
+      //     $(this).children('ul').stop().slideDown();
+      //   }
+      //   , function(){
+      //     $(this).children('ul').stop().slideUp();
+      //   })
+      // });
+            // ↓childrenとnextを使用しない場合
+      // $(function(){
+      //   $('.menu__list').children().hover(function(){
+      //     $(this).find('.menu__list__childList').stop().slideDown();
+      //   }
+      //   , function(){
+      //     $(this).find('.menu__list__childList').stop().slideUp();
+      //   })
+      // });
     </script>
   </body>
 </html>
