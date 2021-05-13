@@ -97,17 +97,33 @@
       // .data('') DOM要素にあるdata-~を取得できる
       // .change() セレクトボックスの値の変更をキャッチする関数
       // $().each() DOM要素を1つずつループ処理をする（ループ内で$(this)を使うと要素がひとつずつ取得できる）
+      // $(function() {
+      //   $('.select').change(sort);
+      //   function sort() {
+      //     var seVal = $(this).val();
+      //     if(seVal === 'all'){
+      //       $('.list').children().show()
+      //     } else {
+      //       $('.list').children().each(function(){
+      //         if(seVal === $(this).data('category-type')){
+      //           $(this).show();
+      //         } else {
+      //           $(this).hide();
+      //         }
+      //       });
+      //     }
+      //   };
+      // });
+
       $(function() {
         $('.select').change(sort);
         function sort() {
-          var se_val=$(this).val();
-          if(se_val=='all'){
-            $('.list').children().each(function(){
-              $(this).show()
-            });
+          var seVal = $(this).val();
+          if(seVal === 'all'){
+            $('.list').children().show()
           } else {
             $('.list').children().each(function(){
-              if(se_val==$(this).data('category-type')){
+              if(seVal === $(this).data('category-type')){
                 $(this).show();
               } else {
                 $(this).hide();
@@ -116,12 +132,36 @@
           }
         };
       });
+
+      // リファクタリング
+      // コードの振る舞いを変えずに改善する
+      // 1 インデント103 演算子の前後にスペース追加　インデント追加して改善した
+      // 2 if文でイコールの2つと３つの違い確認
+      // 等価演算子と厳密等価演算子
+      //「== (等価演算子)」：比較する際に「値」だけをチェックする演算子
+      // 「=== (厳密等価演算子)」：比較する際に「値」と「型」の両方をチェックする演算子
+      // 3つでできるようにと3つの方が良いその理由
+      // 3  each不要でshowは複数対応
+      // each消してshowで対応することでシンプルに
+      // 4 else eachに引数設定できるから調べる
+      // eachの引数がthisを代用できるから調べる
+      // 110行目の
+
 // selectクラスを変更すると引数sortが処理される
 // sortに選択された要素のvalueがse_valに代入される
 // if文にてse_valがallと一致していればlist内の子要素をそれぞれ表示
 // 違う場合はlistの子要素でそれぞれループ処理される
 // もしse_valとlistの選択されている子要素データのcategory-typeが一致していれば表示
 // 一致しなければ非表示
+
+      // var test = 1;
+      // var test2 = '1';
+      // console.log(test == 1);//true
+      // console.log(test === 1);//true
+      // console.log(test2 == 1);//true
+      // console.log(test2 === 1);//false
+      // console.log(true == 1);//true
+      // console.log(true === 1);//false
     </script>
   </body>
 </html>
