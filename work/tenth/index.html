@@ -29,16 +29,32 @@
     <script src="../../common/js/jquery.js"></script>
     <script src="./js/appid.js"></script>
     <script>
-    $(function(){
-      // 変数代入
-                  // var test2 = page;
-            // var test1 = pageCount;
-            // console.log(test1);
-      $('.search__btn').on('click',function(){
-        var keyword = $('.search__text__input').val();
-        var count = 1;
-        // 検索欄に入力した文字のvalをkeywordに代入
-        $.ajax({
+      $(function() {
+        var keyword = {};
+
+        function reset(){
+        $('.pager').remove();
+        $('.lists__item').remove();
+        $('.no_message').remove()
+        $('.errormessage').remove()
+      }
+      $('.search__btn').on('click', function() {
+        keyword = $('.search__text__input').val();
+        ajax(1, keyword);
+      });
+
+        $('body').on('click', '.btn-item:first', function(ev){
+          ev.preventDefault();
+          clickPager(this, keyword, -1);
+        });
+
+                // 次へボタンクリック時の処理
+        $('body').on('click', '.btn-item:last', function(ev){
+          ev.preventDefault();
+          clickPager(this, keyword, 1);
+        });
+        function ajax(page, keyword) {
+      $.ajax({
           url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
           // データを要求する先のURL記載
           type: 'GET',
@@ -53,17 +69,17 @@
           // booksGenreId=楽天ブックスジャンルID
           keyword: keyword,
           // 検索キーワード
-          hits: '20',
-          page: count
+          hits: 20,
+          page: page
           // 1ページあたりの取得件数を20に設定
-        }}).done(function(returnData){
-          $('.pager').remove();
-          $('.lists__item').remove();
-          $('.no_message').remove()
-          $('.errormessage').remove()
+        }}).done(function(returnData,status){
+          reset()
+          $(window).scrollTop($('body').offset().top);
+          // console.log(returnData.pageCount);
           // ↑ページャの重複削除
           if (returnData.count > 0){
-            $.each(returnData.Items,function(i,item){
+            // var i = 10;
+            $.each(returnData.Items,function(index,item){
               // $.each(配列・オブジェクト, function(index, value) { //繰り返し処理を記述する})
               var list = $("<li class='lists__item'>" +
                 "<div class='lists__item__inner'>" +
@@ -73,64 +89,64 @@
                 "<p class='lists__item__detail'>出版社：" +item.Item.publisherName + '</p>' + '</a>' +
                 '</div>' + '</li>');
               $('ul').prepend(list);
-              // console.log(item.Item)
-              // console.log(item);
-              // console.log(returnData.Items);
-              // console.log(item.Item);
-              // console.log(Items.page);ここできないのがわからない
-              // console.log(returnData.page)
-              // console.log(returnData);
-              // console.log(item.Item.itemUrl)
-              // console.log(item.Item.mediumImageUrl)
-              // console.log(item.Item.title)
-            });
-            var test = $('<div class="pager" data-js="pager">' +
-            '<div class="counter">' + '<span class="counter-current">' + returnData.page + '</span>' + '/' + '<span class="counter-all">' + returnData.pageCount + '</span>' +
-            '</div>' + '<div class="btn-wrapper">' + '<a class="btn-item" data-js="page-prev" href="">' + '前へ' + '</a>' + '<a class="btn-item" data-js="page-next" href="">' + '次へ' + '</a>');
+            })
+            var test = $(
+                '<div class="pager" data-js="pager">' +
+                  '<div class="counter">' +
+                    '<span class="counter-current">' + returnData.page + '</span>' +
+                    '/' +
+                    '<span class="counter-all">' + returnData.pageCount +'</span>' +
+                  '</div>' +
+                  '<div class="btn-wrapper">' +
+                    '<a class="prev btn-item" data-js="page-prev" href="">' + '前へ' + '</a>' +
+                    '<a class="btn-item" data-js="page-next" href="">' + '次へ' + '</a>' +
+                  '</div>' +
+                '</div>'
+            );
             $('ul').after(test);
-              // ↓色消すやつ
-            if (count === 1){
-
-              $('page-prev').addClass('disabled')
-
+            // ↓色消すやつ
+            if (page === returnData.first){
+              $('.btn-item:first').addClass('disabled')
+                                  .css('pointer-events', 'none');
+            }else {
+              $('.btn-item:first').removeClass('disabled');
             }
-
-            // ページの変更
-            
-
-
-
-
-
+            if (page === returnData.pageCount){
+              $('.btn-item:last').addClass('disabled')
+                                .css('pointer-events', 'none');
+            } else {
+              $('.btn-item:last').removeClass('disabled');
+            }
           } else {
             $('.message').append('<p class="no_message">検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</p>');
-              // 修正点
-              // 連打したときの表示エラー
-              // failの中にfail.~~ ===エラーコードで表示させる
-              // doneのreturnData見たいにfailの決める
-              // 検索内容が入っていないとき failの設定でなんとかなりそう
-              // できてるけど検索結果ないときの表示（多分elseにエラーコードか今と同じでp追加）
-              // 次へと前への画面遷移（ifで？）
-              // 最初にcountに１を入れる
-              // 次へを押したらcountをプラス１するようにする、前へは
-              // removeで消す
-              // 非表示（disabledクラスを追加する）
-              // varで変数後から作ってわかりやすく
-
         }}).fail(function(fail){
-          $('.pager').remove();
-          $('.lists__item').remove();
-          $('.no_message').remove()
-          $('.errormessage').remove()
-          var errorNumber = fail.status;
-          console.log(errorNumber)
-          if(errorNumber === 400) {
-            var test2 = $('<p class="errormessage">検索文字が入力されていません。</P>')
-              $('.message').prepend(test2)
+            reset();
+            var errorNumber = fail.status;
+            console.log(errorNumber)
+            if(errorNumber === 400) {
+              var errormessage = $('<p class="errormessage">検索文字が入力されていません。</P>')
+                $('.message').prepend(errormessage)
+            }else if(errorNumber === 429) {
+              var errormessage= $('<p class="errormessage">リクエスト過多です。しばらく時間を置いてからお試しください。</P>')
+                $('.message').prepend(errormessage)
+            }else if(errorNumber === 500) {
+              var errormessage = $('<p class="errormessage">システムエラー。長時間続くようであれば、<a href="https://webservice.faq.rakuten.net/hc/ja/requests/new">こちら</a>よりごお問い合わせください。</P>')
+            }
+            $('.message').prepend(errormessage)
+          });
+      }
+      function clickPager(btn, key, i){
+          var pageCurrent = Number($('.counter-current').text());
+          if ($(btn).hasClass('disabled') === false) {
+            ajax(pageCurrent+i, key);
+            console.log(key)
           }
-        });
+        }
+
+
       });
-    });
+
+
     </script>
   </body>
 </html>
