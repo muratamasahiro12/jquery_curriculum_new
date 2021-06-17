@@ -30,28 +30,88 @@
     <script src="./js/appid.js"></script>
     <script>
       $(function() {
-        // 検索ボタンクリック時の処理(元からあるボタンだからどっちでもいいかも)
-        // .on( events [, selector] , handler(eventObject) )
+        // ボタンクリック時の処理
         $('.search').on('click', '.search__btn', function(){
           keyword = $('.search__text__input').val();
           ajaxProcessing(1, keyword);
         });
-        // 前へボタンクリック時の処理
         // preventDefaultでデフォルトのデフォルト動作をキャンセルする(aタグの画面遷移)
         $('body').on('click', '.btn-item[data-js = page-prev]', function(ev){
           ev.preventDefault();
-          clickPager(-1, keyword);
+          ajaxProcessing(pageCount + -1, keyword)
         });
-        // 次へボタンクリック時の処理
         $('body').on('click', '.btn-item[data-js = page-next]', function(ev){
           ev.preventDefault();
-          clickPager(1, keyword);
+          ajaxProcessing(pageCount + 1, keyword)
         });
-        // 現ページ番号
-        var pageCount;
+
         // --関数の定義--
         function reset(){
           $('.pager,.lists__item,.errorMessage').remove();
+        };
+
+        function doneProcessing(returnData){
+          $.each(returnData.Items,function(index,item){
+            var list = $(
+              "<li class='lists__item'>" +
+                "<div class='lists__item__inner'>" +
+                  "<a href='" +item.Item.itemUrl +"'class='lists__item__link' target='_blank'>" +
+                    "<img src='" + item.Item.mediumImageUrl +"' class='lists__item__img' alt>" +
+                    "<p class='lists__item__detail'>作品名：" +item.Item.title + '</p>' +
+                    "<p class='lists__item__detail'>作者：" +item.Item.author + '</p>' +
+                    "<p class='lists__item__detail'>出版社：" +item.Item.publisherName + '</p>' +
+                  '</a>' +
+                '</div>' +
+              '</li>');
+              $('ul').append(list);
+        })};
+        
+        function pagerDisplay(returnData){
+          var pager = $(
+                  '<div class="pager" data-js="pager">' +
+                    '<div class="counter">' +
+                      '<span class="counter-current">' + returnData.page + '</span>' +
+                      '/' +
+                      '<span class="counter-all">' + returnData.pageCount +'</span>' +
+                    '</div>' +
+                    '<div class="btn-wrapper">' +
+                      '<a class="prev btn-item" data-js="page-prev" href="">' +
+                        '前へ' +
+                      '</a>' +
+                      '<a class="btn-item" data-js="page-next" href="">' +
+                        '次へ' +
+                      '</a>' +
+                    '</div>' +
+                  '</div>'
+                );
+                $('ul').after(pager);
+        };
+        // ↓ページャ非活性
+        function pagerDisabled(page,returnData){
+          if (page === returnData.first){
+            $('.btn-item[data-js = page-prev]').addClass('disabled')
+                                                .css('pointer-events', 'none');
+          };
+          if (page === returnData.pageCount){
+            $('.btn-item[data-js = page-next]').addClass('disabled')
+                                    .css('pointer-events', 'none');
+          }
+        }
+        function failProcessing(errorNumber){
+          switch( errorNumber ) {
+                  case 0:
+                  $('.message').prepend('<p class="errorMessage">通信に失敗しました。インターネットの接続をご確認ください。</P>');
+                  break;
+                  case 400:
+                  $('.message').prepend('<p class="errorMessage">検索文字が入力されていません。</P>');
+                  break;
+                  case 429:
+                  $('.message').prepend('<p class="errorMessage">リクエスト過多です。しばらく時間を置いてからお試しください。</P>');
+                  break;
+                  case 500:
+                  $('.message').prepend('<p class="errorMessage">システムエラー。長時間続くようであれば、<a href="https://webservice.faq.rakuten.net/hc/ja/requests/new">こちら</a>よりごお問い合わせください。</P>');
+                  break;
+                }
         };
         function ajaxProcessing(page, keyword){
           $.ajax({
@@ -76,76 +136,27 @@
               pageCount = returnData.page;
               $(window).scrollTop();
               if (returnData.count > 0){
-                $.each(returnData.Items,function(index,item){
-                // doneからreturnData持ってきてそのなかのItems(全体情報)からitem(個別情報)へ
-                // $.each(配列・オブジェクト, function(index, value) { //繰り返し処理を記述する})
-                var list = $(
-                  "<li class='lists__item'>" +
-                    "<div class='lists__item__inner'>" +
-                      "<a href='" +item.Item.itemUrl +"'class='lists__item__link' target='_blank'>" +
-                        "<img src='" + item.Item.mediumImageUrl +"' class='lists__item__img' alt>" +
-                        "<p class='lists__item__detail'>作品名：" +item.Item.title + '</p>' +
-                        "<p class='lists__item__detail'>作者：" +item.Item.author + '</p>' +
-                        "<p class='lists__item__detail'>出版社：" +item.Item.publisherName + '</p>' +
-                      '</a>' +
-                    '</div>' +
-                  '</li>');
-                  $('ul').append(list);
-                  // console.log(returnData)
-                  // console.log(item)
-                })
-                var pager = $(
-                  '<div class="pager" data-js="pager">' +
-                    '<div class="counter">' +
-                      '<span class="counter-current">' + returnData.page + '</span>' +
-                      '/' +
-                      '<span class="counter-all">' + returnData.pageCount +'</span>' +
-                    '</div>' +
-                    '<div class="btn-wrapper">' +
-                      '<a class="prev btn-item" data-js="page-prev" href="">' +
-                        '前へ' +
-                      '</a>' +
-                      '<a class="btn-item" data-js="page-next" href="">' +
-                        '次へ' +
-                      '</a>' +
-                    '</div>' +
-                  '</div>'
-                );
-                $('ul').after(pager);
-                // ↓ページャ非活性
-                if (page === returnData.first){
-                  $('.btn-item[data-js = page-prev]').addClass('disabled')
-                                      .css('pointer-events', 'none');
-                };
-                if (page === returnData.pageCount){
-                  $('.btn-item[data-js = page-next]').addClass('disabled')
-                                    .css('pointer-events', 'none');
-                };
+                doneProcessing(returnData)
+                pagerDisplay(returnData)
+                pagerDisabled(page,returnData)
               } else {
                 $('.message').prepend('<p class="errorMessage">検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</p>');
             }}).fail(function(fail){
+              // errorNumber = fail.status;
               reset();
-              var errorNumber = fail.status;
+              failProcessing(fail.status);
               // console.log(errorNumber)
-                if(errorNumber === 0) {
-                  var error = $('<p class="errorMessage">通信に失敗しました。インターネットの接続をご確認ください。</P>')
-                    $('.message').prepend(error);
-                }else if(errorNumber === 400) {
-                  var error = $('<p class="errorMessage">検索文字が入力されていません。</P>')
-                  $('.message').prepend(error);
-                }else if(errorNumber === 429) {
-                  var error = $('<p class="errorMessage">リクエスト過多です。しばらく時間を置いてからお試しください。</P>')
-                  $('.message').prepend(error);
-                }else if(errorNumber === 500) {
-                  var error = $('<p class="errorMessage">システムエラー。長時間続くようであれば、<a href="https://webservice.faq.rakuten.net/hc/ja/requests/new">こちら</a>よりごお問い合わせください。</P>')
-                    $('.message').prepend(error);
-                };
               });
             };
-        function clickPager(i, keyword){
-          ajaxProcessing(pageCount+i, keyword);
-        };
       });
+      // 検索ボタン押したときの処理でclickPagerを使わなくて済むように
+      // →ajaxProcessing利用
+      // スイッチ文を利用する(if文の代わり)
+      // スイッチ文利用
+      // done,failの中身を関数化して中身短く
+      // css('pointer-events', 'none')でボタンを押せなくするのではなくボタンは押せるけどそのボタンにdisabledがついていたら処理しない、ついていなかったらdisabled
+
+
 
       // 楽天ブックスの総合検索APIを使って製作してください。
       // answerの挙動を良く見てね！
