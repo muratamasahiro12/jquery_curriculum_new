@@ -34,16 +34,16 @@
         // .on( events [, selector] , handler(eventObject) )
         $('.search').on('click', '.search__btn', function(){
           keyword = $('.search__text__input').val();
-          ajax(1, keyword);
+          ajaxProcessing(1, keyword);
         });
         // 前へボタンクリック時の処理
         // preventDefaultでデフォルトのデフォルト動作をキャンセルする(aタグの画面遷移)
-        $('body').on('click', '.btn-item:first', function(ev){
+        $('body').on('click', '.btn-item[data-js = page-prev]', function(ev){
           ev.preventDefault();
           clickPager(-1, keyword);
         });
         // 次へボタンクリック時の処理
-        $('body').on('click', '.btn-item:last', function(ev){
+        $('body').on('click', '.btn-item[data-js = page-next]', function(ev){
           ev.preventDefault();
           clickPager(1, keyword);
         });
@@ -51,9 +51,9 @@
         var pageCount;
         // --関数の定義--
         function reset(){
-          $('.pager,.lists__item,.errormessage').remove();
+          $('.pager,.lists__item,.errorMessage').remove();
         };
-        function ajax(page, keyword){
+        function ajaxProcessing(page, keyword){
           $.ajax({
             url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
             // データを要求する先のURL記載
@@ -90,7 +90,7 @@
                       '</a>' +
                     '</div>' +
                   '</li>');
-                  $('ul').prepend(list);
+                  $('ul').append(list);
                   // console.log(returnData)
                   // console.log(item)
                 })
@@ -114,11 +114,11 @@
                 $('ul').after(pager);
                 // ↓ページャ非活性
                 if (page === returnData.first){
-                  $('.btn-item:first').addClass('disabled')
+                  $('.btn-item[data-js = page-prev]').addClass('disabled')
                                       .css('pointer-events', 'none');
                 };
                 if (page === returnData.pageCount){
-                  $('.btn-item:last').addClass('disabled')
+                  $('.btn-item[data-js = page-next]').addClass('disabled')
                                     .css('pointer-events', 'none');
                 };
               } else {
@@ -127,20 +127,23 @@
               reset();
               var errorNumber = fail.status;
               // console.log(errorNumber)
-                if(errorNumber === 400) {
-                  var errorMessage = $('<p class="errormessage">検索文字が入力されていません。</P>')
-                  $('.message').prepend(errormessage)
+                if(errorNumber === 0) {
+                  var error = $('<p class="errorMessage">通信に失敗しました。インターネットの接続をご確認ください。</P>')
+                    $('.message').prepend(error);
+                }else if(errorNumber === 400) {
+                  var error = $('<p class="errorMessage">検索文字が入力されていません。</P>')
+                  $('.message').prepend(error);
                 }else if(errorNumber === 429) {
-                  var errorMessage= $('<p class="errormessage">リクエスト過多です。しばらく時間を置いてからお試しください。</P>')
-                  $('.message').prepend(errormessage)
+                  var error = $('<p class="errorMessage">リクエスト過多です。しばらく時間を置いてからお試しください。</P>')
+                  $('.message').prepend(error);
                 }else if(errorNumber === 500) {
-                  var errorMessage = $('<p class="errormessage">システムエラー。長時間続くようであれば、<a href="https://webservice.faq.rakuten.net/hc/ja/requests/new">こちら</a>よりごお問い合わせください。</P>')
+                  var error = $('<p class="errorMessage">システムエラー。長時間続くようであれば、<a href="https://webservice.faq.rakuten.net/hc/ja/requests/new">こちら</a>よりごお問い合わせください。</P>')
+                    $('.message').prepend(error);
                 };
-                $('.message').prepend(errorMessage)
               });
             };
         function clickPager(i, keyword){
-            ajax(pageCount+i, keyword);
+          ajaxProcessing(pageCount+i, keyword);
         };
       });
 
