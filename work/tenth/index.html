@@ -38,10 +38,16 @@
         // preventDefaultでデフォルトのデフォルト動作をキャンセルする(aタグの画面遷移)
         $('body').on('click', '.btn-item[data-js = page-prev]', function(ev){
           ev.preventDefault();
+          if ($('.btn-item[data-js = page-prev]').hasClass('disabled')) {
+            return false;
+          };
           ajaxProcessing(pageCount + -1, keyword)
         });
         $('body').on('click', '.btn-item[data-js = page-next]', function(ev){
           ev.preventDefault();
+          if ($('.btn-item[data-js = page-next]').hasClass('disabled')) {
+            return false;
+          };
           ajaxProcessing(pageCount + 1, keyword)
         });
 
@@ -65,53 +71,51 @@
               '</li>');
               $('ul').append(list);
         })};
-        
+
         function pagerDisplay(returnData){
           var pager = $(
-                  '<div class="pager" data-js="pager">' +
-                    '<div class="counter">' +
-                      '<span class="counter-current">' + returnData.page + '</span>' +
-                      '/' +
-                      '<span class="counter-all">' + returnData.pageCount +'</span>' +
-                    '</div>' +
-                    '<div class="btn-wrapper">' +
-                      '<a class="prev btn-item" data-js="page-prev" href="">' +
-                        '前へ' +
-                      '</a>' +
-                      '<a class="btn-item" data-js="page-next" href="">' +
-                        '次へ' +
-                      '</a>' +
-                    '</div>' +
-                  '</div>'
-                );
-                $('ul').after(pager);
+            '<div class="pager" data-js="pager">' +
+              '<div class="counter">' +
+                '<span class="counter-current">' + returnData.page + '</span>' +
+                '/' +
+                '<span class="counter-all">' + returnData.pageCount +'</span>' +
+              '</div>' +
+              '<div class="btn-wrapper">' +
+                '<a class="prev btn-item" data-js="page-prev" href="">' +
+                  '前へ' +
+                '</a>' +
+                '<a class="btn-item" data-js="page-next" href="">' +
+                  '次へ' +
+                '</a>' +
+              '</div>' +
+            '</div>'
+          );
+          $('ul').after(pager);
         };
         // ↓ページャ非活性
         function pagerDisabled(page,returnData){
           if (page === returnData.first){
-            $('.btn-item[data-js = page-prev]').addClass('disabled')
-                                                .css('pointer-events', 'none');
+            $('.btn-item[data-js = page-prev]').addClass('disabled');
           };
           if (page === returnData.pageCount){
             $('.btn-item[data-js = page-next]').addClass('disabled')
-                                    .css('pointer-events', 'none');
           }
         }
         function failProcessing(errorNumber){
           switch( errorNumber ) {
-                  case 0:
-                  $('.message').prepend('<p class="errorMessage">通信に失敗しました。インターネットの接続をご確認ください。</P>');
-                  break;
-                  case 400:
-                  $('.message').prepend('<p class="errorMessage">検索文字が入力されていません。</P>');
-                  break;
-                  case 429:
-                  $('.message').prepend('<p class="errorMessage">リクエスト過多です。しばらく時間を置いてからお試しください。</P>');
-                  break;
-                  case 500:
-                  $('.message').prepend('<p class="errorMessage">システムエラー。長時間続くようであれば、<a href="https://webservice.faq.rakuten.net/hc/ja/requests/new">こちら</a>よりごお問い合わせください。</P>');
-                  break;
-                }
+            case 0:
+            $('.message').prepend('<p class="errorMessage">通信に失敗しました。インターネットの接続をご確認ください。</P>');
+            break;
+            case 400:
+            $('.message').prepend('<p class="errorMessage">検索文字が入力されていません。</P>');
+            break;
+            case 429:
+            $('.message').prepend('<p class="errorMessage">リクエスト過多です。しばらく時間を置いてからお試しください。</P>');
+            break;
+            case 500:
+            $('.message').prepend('<p class="errorMessage">システムエラー。長時間続くようであれば、<a href="https://webservice.faq.rakuten.net/hc/ja/requests/new">こちら</a>よりごお問い合わせください。</P>');
+            break;
+          };
         };
         function ajaxProcessing(page, keyword){
           $.ajax({
