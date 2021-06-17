@@ -101,6 +101,9 @@
             $('.btn-item[data-js = page-next]').addClass('disabled')
           }
         }
+        function notFound() {
+          $('.message').prepend('<p class="errorMessage">検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</p>');
+        }
         function failProcessing(errorNumber){
           switch( errorNumber ) {
             case 0:
@@ -144,12 +147,10 @@
                 pagerDisplay(returnData)
                 pagerDisabled(page,returnData)
               } else {
-                $('.message').prepend('<p class="errorMessage">検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</p>');
+                notFound()
             }}).fail(function(fail){
-              // errorNumber = fail.status;
               reset();
               failProcessing(fail.status);
-              // console.log(errorNumber)
               });
             };
       });
