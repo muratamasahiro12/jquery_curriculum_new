@@ -31,9 +31,11 @@
     <script>
       $(function() {
         var keyword;
-        // ボタンクリック時の処理
+        var list;
+        // ボタンクリック時の処理　データ属性で取得
+        // サーチボタンもデータ属性で
         $('.search').on('click', '.search__btn', function(){
-          keyword = $('.search__text__input').val();
+          keyword = $('.search__text__input[data-js = search-word]').val();
           ajaxProcessing(1, keyword);
         });
         // preventDefaultでデフォルトのデフォルト動作をキャンセルする(aタグの画面遷移)
@@ -45,6 +47,7 @@
           // グレーアウト時クリック無効
           if ($('.btn-item[data-js = page-prev]').hasClass('disabled')) {
             return false;
+            // 返り値の場合と処理を中断の意味がある
           };
           ajaxProcessing(pageCount + -1, keyword);
         });
@@ -61,9 +64,10 @@
         function reset(){
           $('.pager,.lists__item,.errorMessage').remove();
         };
+        // appendは一回にしたいeach後にappend ulはクラス名で指定　ページャも同様　　修正済み
         function doneProcessing(returnData){
           $.each(returnData.Items,function(index,item){
-            var list = $(
+            list = $(
               '<li class="lists__item">' +
                 '<div class="lists__item__inner">' +
                   '<a href="' + item.Item.itemUrl +'"class="lists__item__link" target="_blank" rel="noopener noreferrer">' +
@@ -73,9 +77,12 @@
                     '<p class="lists__item__detail">出版社：' + item.Item.publisherName + '</p>' +
                   '</a>' +
                 '</div>' +
-              '</li>');
-              $('ul').append(list);
-        })};
+              '</li>'
+            );
+            $('.lists').append(list);
+          });
+          console.log(list)
+        };
         function pagerDisplay(returnData){
           var pager = $(
             '<div class="pager" data-js="pager">' +
@@ -94,7 +101,7 @@
               '</div>' +
             '</div>'
           );
-          $('ul').after(pager);
+          $('.lists').after(pager);
         };
         // ↓ページャ非活性
         function pagerDisabled(page,returnData){
@@ -108,28 +115,33 @@
         function notFound() {
           $('.message').prepend('<p class="errorMessage">検索結果が見つかりませんでした。<br>別のキーワードで検索して下さい。</p>');
         }
+        // その他のエラーは最後にエラー表示するように　スイッチ文のインデント確認する最後があっていれば
         function failProcessing(errorNumber){
           switch( errorNumber ) {
             case 0:
-            $('.message').prepend('<p class="errorMessage">通信に失敗しました。インターネットの接続をご確認ください。</P>');
-            break;
+              $('.message').prepend('<p class="errorMessage">通信に失敗しました。インターネットの接続をご確認ください。</P>');
+              break;
             case 400:
-            $('.message').prepend('<p class="errorMessage">検索文字が入力されていません。</P>');
-            break;
+              $('.message').prepend('<p class="errorMessage">検索文字が入力されていません。</P>');
+              break;
             case 429:
-            $('.message').prepend('<p class="errorMessage">リクエスト過多です。しばらく時間を置いてからお試しください。</P>');
-            break;
+              $('.message').prepend('<p class="errorMessage">リクエスト過多です。しばらく時間を置いてからお試しください。</P>');
+              break;
             case 500:
-            $('.message').prepend('<p class="errorMessage">システムエラー。長時間続くようであれば、<a href="https://webservice.faq.rakuten.net/hc/ja/requests/new">こちら</a>よりごお問い合わせください。</P>');
-            break;
+              $('.message').prepend('<p class="errorMessage">システムエラー。長時間続くようであれば、<a href="https://webservice.faq.rakuten.net/hc/ja/requests/new">こちら</a>よりごお問い合わせください。</P>');
+              break;
+            default:
+              $('.message').prepend('<p class="errorMessage">メンテナンス</P>')
           };
         };
+        // インデント修正
+
         function ajaxProcessing(page, keyword){
           $.ajax({
             url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
-            // データを要求する先のURL記載
+            // リクエスト先のURL記載
             type: 'GET',
-            // 通信に利用するHTTPメソッド（デフォルトはGETだから不要かも）
+            // 通信に利用するHTTPメソッド（デフォルトはGETだから不要かも）分かりやすいように
             datatype: 'json',
             // 応答データの種類（text、html、xml、json、jsonp、script）
             //jsonの意味と使用理由 https://techplay.jp/column/611
@@ -142,8 +154,9 @@
               // 検索キーワード
               hits: 20,
               page: page
-            }}).done(function(returnData){
-              console.log(returnData);
+            }
+          }).done(function(returnData){
+              // console.log(returnData);
               reset();
               pageCount = returnData.page;
               $(window).scrollTop();
