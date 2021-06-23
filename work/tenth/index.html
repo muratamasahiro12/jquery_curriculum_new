@@ -30,6 +30,7 @@
     <script src="./js/appid.js"></script>
     <script>
       $(function() {
+        var keyword;
         // ボタンクリック時の処理
         $('.search').on('click', '.search__btn', function(){
           keyword = $('.search__text__input').val();
@@ -37,41 +38,44 @@
         });
         // preventDefaultでデフォルトのデフォルト動作をキャンセルする(aタグの画面遷移)
         $('body').on('click', '.btn-item[data-js = page-prev]', function(ev){
+          // ↓aタグの画面遷移無効
           ev.preventDefault();
+          // console.log(ev);
+          // return false;(クリックしても画面が変わらない)
+          // グレーアウト時クリック無効
           if ($('.btn-item[data-js = page-prev]').hasClass('disabled')) {
             return false;
           };
-          ajaxProcessing(pageCount + -1, keyword)
+          ajaxProcessing(pageCount + -1, keyword);
         });
         $('body').on('click', '.btn-item[data-js = page-next]', function(ev){
           ev.preventDefault();
+
           if ($('.btn-item[data-js = page-next]').hasClass('disabled')) {
             return false;
           };
-          ajaxProcessing(pageCount + 1, keyword)
+          ajaxProcessing(pageCount + 1, keyword);
         });
 
         // --関数の定義--
         function reset(){
           $('.pager,.lists__item,.errorMessage').remove();
         };
-
         function doneProcessing(returnData){
           $.each(returnData.Items,function(index,item){
             var list = $(
-              "<li class='lists__item'>" +
-                "<div class='lists__item__inner'>" +
-                  "<a href='" +item.Item.itemUrl +"'class='lists__item__link' target='_blank'>" +
-                    "<img src='" + item.Item.mediumImageUrl +"' class='lists__item__img' alt>" +
-                    "<p class='lists__item__detail'>作品名：" +item.Item.title + '</p>' +
-                    "<p class='lists__item__detail'>作者：" +item.Item.author + '</p>' +
-                    "<p class='lists__item__detail'>出版社：" +item.Item.publisherName + '</p>' +
+              '<li class="lists__item">' +
+                '<div class="lists__item__inner">' +
+                  '<a href="' + item.Item.itemUrl +'"class="lists__item__link" target="_blank" rel="noopener noreferrer">' +
+                    '<img src="' + item.Item.mediumImageUrl +'" class="lists__item__img" alt="">' +
+                    '<p class="lists__item__detail">作品名：' + item.Item.title + '</p>' +
+                    '<p class="lists__item__detail">作者：' + item.Item.author + '</p>' +
+                    '<p class="lists__item__detail">出版社：' + item.Item.publisherName + '</p>' +
                   '</a>' +
                 '</div>' +
               '</li>');
               $('ul').append(list);
         })};
-
         function pagerDisplay(returnData){
           var pager = $(
             '<div class="pager" data-js="pager">' +
@@ -98,7 +102,7 @@
             $('.btn-item[data-js = page-prev]').addClass('disabled');
           };
           if (page === returnData.pageCount){
-            $('.btn-item[data-js = page-next]').addClass('disabled')
+            $('.btn-item[data-js = page-next]').addClass('disabled');
           }
         }
         function notFound() {
@@ -139,17 +143,19 @@
               hits: 20,
               page: page
             }}).done(function(returnData){
-              reset()
+              console.log(returnData);
+              reset();
               pageCount = returnData.page;
               $(window).scrollTop();
               if (returnData.count > 0){
-                doneProcessing(returnData)
-                pagerDisplay(returnData)
-                pagerDisabled(page,returnData)
+                doneProcessing(returnData);
+                pagerDisplay(returnData);
+                pagerDisabled(page,returnData);
               } else {
-                notFound()
+                notFound();
             }}).fail(function(fail){
               reset();
+              // console.log(fail.status);
               failProcessing(fail.status);
               });
             };
@@ -159,7 +165,10 @@
       // スイッチ文を利用する(if文の代わり)
       // スイッチ文利用
       // done,failの中身を関数化して中身短く
-      // css('pointer-events', 'none')でボタンを押せなくするのではなくボタンは押せるけどそのボタンにdisabledがついていたら処理しない、ついていなかったらdisabled
+      // css('pointer-events', 'none')でボタンを押せなくするのではなくボタンは押せるけどそのボタンにdisabledがついていたら処理しない、ついていたら普通に
+      // → if ($('.btn-item[data-js = page-prev]').hasClass('disabled')) {
+      //       return false;
+      //     };
 
 
 
