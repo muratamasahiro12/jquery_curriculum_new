@@ -31,11 +31,11 @@
     <script>
       $(function() {
         var keyword;
-        var list;
+        // var list;
         // ボタンクリック時の処理　データ属性で取得
         // サーチボタンもデータ属性で
         $('.search').on('click', '.search__btn', function(){
-          keyword = $('.search__text__input[data-js = search-word]').val();
+          keyword = $('[data-js = search-word]').val();
           ajaxProcessing(1, keyword);
         });
         // preventDefaultでデフォルトのデフォルト動作をキャンセルする(aタグの画面遷移)
@@ -66,8 +66,9 @@
         };
         // appendは一回にしたいeach後にappend ulはクラス名で指定　ページャも同様　　修正済み
         function doneProcessing(returnData){
+          var list ='';
           $.each(returnData.Items,function(index,item){
-            list = $(
+            list +=
               '<li class="lists__item">' +
                 '<div class="lists__item__inner">' +
                   '<a href="' + item.Item.itemUrl +'"class="lists__item__link" target="_blank" rel="noopener noreferrer">' +
@@ -78,10 +79,9 @@
                   '</a>' +
                 '</div>' +
               '</li>'
-            );
-            $('.lists').append(list);
           });
-          console.log(list)
+          $('.lists').append(list);
+          // console.log(list)　ここに
         };
         function pagerDisplay(returnData){
           var pager = $(
@@ -131,7 +131,8 @@
               $('.message').prepend('<p class="errorMessage">システムエラー。長時間続くようであれば、<a href="https://webservice.faq.rakuten.net/hc/ja/requests/new">こちら</a>よりごお問い合わせください。</P>');
               break;
             default:
-              $('.message').prepend('<p class="errorMessage">メンテナンス</P>')
+              $('.message').prepend('<p class="errorMessage">予期せぬエラー</P>')
+              break;
           };
         };
         // インデント修正
